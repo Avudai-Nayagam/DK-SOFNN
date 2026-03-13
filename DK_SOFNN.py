@@ -524,9 +524,9 @@ def parameter_reinforcement_update(model, x_sample, y_actual, source_params,
     sum_u = np.sum(u) + EPS
 
     # Source knowledge parameters (K_S)
-    src_c = source_params['centers']  # (K_s, P)
-    src_w_val = source_params['widths']
-    src_wt = source_params['weights']
+    src_c = source_params['centers']   # (K_s, P)
+    src_sigma = source_params['widths']  # (K_s, P)
+    src_wt = source_params['weights']  # (K_s, 1)
 
     # Match dimensions: if target has different # rules than source,
     # use the mean source parameters as the knowledge anchor
@@ -534,11 +534,11 @@ def parameter_reinforcement_update(model, x_sample, y_actual, source_params,
     if src_c.shape[0] != K_T:
         # Broadcast source mean as knowledge anchor
         anchor_c = np.tile(np.mean(src_c, axis=0), (K_T, 1))
-        anchor_sigma = np.tile(np.mean(src_w_val, axis=0), (K_T, 1))
+        anchor_sigma = np.tile(np.mean(src_sigma, axis=0), (K_T, 1))
         anchor_w = np.full((K_T, 1), np.mean(src_wt))
     else:
         anchor_c = src_c
-        anchor_sigma = src_w_val
+        anchor_sigma = src_sigma
         anchor_w = src_wt
 
     # Evaluate each (α_h, β_h) candidate — Eqs. (23), (27)
@@ -599,7 +599,7 @@ def calculate_metrics(y_true, y_pred):
 
     Eq. (42): RMSE  = sqrt( mean( (y_true - y_pred)^2 ) )
     Eq. (43): sMAPE = mean( 2 * |y_pred - y_true| / (|y_pred| + |y_true|) )
-    Eq. (44): MASE  = mean( ((y_pred - y_true) / y_true)^2 )
+    Eq. (44): MASE  = mean( ((y_pred - y_true) / y_true)^2 )  [squared relative error]
 
     Args:
         y_true : ndarray, shape (N,) or (N, 1)
