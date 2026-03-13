@@ -308,9 +308,9 @@ def source_self_organization(model, X_data, y_data, n_iterations=5):
             The rule l with min R, max M, max C is the most *effective*.
             Practically: M_l > M_avg AND C_l > C_avg → effective.
         Eq. (14) — New rule parameters:
-            c_new = c_l + perturbation  (paper: c_new = x_S(n))
-            σ_new = σ_l  (paper: |x_S(n) - c_l| / √2)
-            w_new = w_l
+            c_new = x_S(n)              (center at a training sample)
+            σ_new = |x_S(n) - c_l| / √2 (width from distance to trigger rule)
+            w_new = w_l                  (inherit trigger rule weight)
         Eq. (15) — Pruning criterion:
             The rule l with max R, min M, min C is the most *ineffective*.
             Practically: M_l < M_avg AND C_l < C_avg → ineffective.
@@ -599,7 +599,10 @@ def calculate_metrics(y_true, y_pred):
 
     Eq. (42): RMSE  = sqrt( mean( (y_true - y_pred)^2 ) )
     Eq. (43): sMAPE = mean( 2 * |y_pred - y_true| / (|y_pred| + |y_true|) )
-    Eq. (44): MASE  = mean( ((y_pred - y_true) / y_true)^2 )  [squared relative error]
+    Eq. (44): MASE  = mean( ((y_pred - y_true) / y_true)^2 )
+              Note: The paper defines MASE as a squared relative error metric
+              (Eq. 44), which differs from the standard MASE definition used
+              in time-series forecasting. We follow the paper's definition.
 
     Args:
         y_true : ndarray, shape (N,) or (N, 1)
